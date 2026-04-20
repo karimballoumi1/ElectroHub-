@@ -24,6 +24,7 @@ public class AuthService {
     private final JwtUtils jwtUtils;
     private final AuthenticationManager authenticationManager;
     private final UserDetailsService userDetailsService;
+    private final EmailService emailService;
 
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -37,6 +38,9 @@ public class AuthService {
         user.setRole(Role.USER); // Default role
 
         userRepository.save(user);
+
+        // Envoyer l'email de bienvenue
+        emailService.sendWelcomeEmail(user.getEmail());
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
         String token = jwtUtils.generateToken(userDetails);

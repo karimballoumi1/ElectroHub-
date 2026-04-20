@@ -17,6 +17,7 @@ public class OrderService {
     private final CartService cartService;
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
+    private final EmailService emailService;
 
     public Order createOrder(String userEmail, java.util.Map<String, String> shippingDetails) {
         User user = userRepository.findByEmail(userEmail).orElseThrow();
@@ -58,6 +59,9 @@ public class OrderService {
 
         cart.getItems().clear();
         cartRepository.save(cart);
+
+        // Envoyer l'email de confirmation de commande
+        emailService.sendOrderConfirmationEmail(savedOrder, userEmail);
 
         return savedOrder;
     }
